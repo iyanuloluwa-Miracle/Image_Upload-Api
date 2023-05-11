@@ -1,6 +1,8 @@
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const sizeOf = require('image-size');
+
 // Set storage engine
 const storage = multer.diskStorage({
   destination: './public/uploads/',
@@ -43,7 +45,12 @@ exports.uploadFile = async (req, res) => {
       if (req.file == undefined) {
         res.status(400).json({ error: 'Error: No file selected!' });
       } else {
-        res.json({ message: 'File uploaded!', file: req.file });
+        // Get the dimensions of the uploaded image
+        const dimensions = sizeOf(req.file.path);
+        const width = dimensions.width;
+        const height = dimensions.height;
+        // Send response to client
+        res.json({ message: 'File uploaded!', file: req.file, width, height });
       }
     }
   });
@@ -59,6 +66,4 @@ exports.getFile = async (req, res) => {
   } else {
     res.status(404).json({ error: 'File not found!' });
   }
-
-
 }
